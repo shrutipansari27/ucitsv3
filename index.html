@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>UCITS ETF Tax Advantage — Wio Invest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --brand:  #5700FF;
+  --accent: #EEE6FE;
+  --white:  #FFFFFF;
+  --ink:    #0D0D1A;
+  --muted:  #6B7280;
+  --faint:  #F4F3F8;
+  --border: #E8E6F0;
+}
+html, body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--white);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+nav {
+  max-width: 100%; margin: 0;
+  padding: 16px 32px 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.nav-logo img { width: 44px; height: 44px; border-radius: 10px; display: block; }
+.nav-logo-name { font-size: 13px; font-weight: 800; color: var(--ink); }
+.nav-chip { font-size: 11px; font-weight: 600; color: var(--brand); background: var(--accent); border-radius: 99px; padding: 4px 12px; }
+.page { max-width: 100%; margin: 0; padding: 0 32px 32px; display: flex; flex-direction: column; min-height: calc(100vh - 56px); }
+.hero { padding: 28px 0 24px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+.hero-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--brand); margin-bottom: 10px; }
+.hero-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); }
+.hero-headline { font-size: clamp(24px, 3vw, 34px); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; color: var(--ink); margin-bottom: 8px; }
+.hero-headline em { font-style: italic; color: var(--brand); }
+.hero-sub { font-size: 14px; line-height: 1.6; color: var(--muted); max-width: 560px; }
+.main-row { display: grid; grid-template-columns: 2fr 3fr; gap: 20px; align-items: stretch; min-width: 0; flex: 1; }
+.inputs-panel { border: 1.5px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; height: 100%; min-width: 0; }
+.isec { display: flex; flex-direction: column; }
+.isec + .isec { border-top: 1px solid var(--border); padding-top: 18px; }
+.isec:not(:last-child) { padding-bottom: 18px; }
+.s-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.s-lbl { font-size: 12px; font-weight: 600; color: var(--muted); }
+.s-input-wrap { display: flex; align-items: center; gap: 2px; border: 1.5px solid var(--border); border-radius: 8px; padding: 5px 8px; background: var(--faint); flex-shrink: 0; transition: all 0.15s; }
+.s-input-wrap:focus-within { border-color: var(--brand); background: white; box-shadow: 0 0 0 3px rgba(87,0,255,0.07); }
+.s-input-wrap .pfx { font-size: 12px; font-weight: 600; color: var(--muted); }
+.s-input-wrap .sfx { font-size: 11px; font-weight: 500; color: var(--muted); }
+.s-input-wrap input[type=number] { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; color: var(--ink); background: transparent; border: none; outline: none; width: 60px; max-width: 100%; padding: 0; -moz-appearance: textfield; }
+.s-input-wrap input[type=number]::-webkit-outer-spin-button,
+.s-input-wrap input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+.s-input-wrap input.pct { width: 36px; }
+.track-wrap { position: relative; height: 3px; background: var(--border); border-radius: 99px; }
+.track-fill { position: absolute; inset: 0 auto 0 0; background: var(--brand); border-radius: 99px; pointer-events: none; }
+input[type=range] { -webkit-appearance: none; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 100%; height: 22px; background: transparent; cursor: pointer; outline: none; margin: 0; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: white; border: 2px solid var(--brand); box-shadow: 0 1px 6px rgba(87,0,255,0.2); }
+.tick-row { position: relative; height: 14px; margin-top: 4px; }
+.tick-row span { position: absolute; transform: translateX(-50%); font-size: 10px; color: var(--muted); white-space: nowrap; font-weight: 500; }
+.tick-row span:first-child { transform: none; }
+.tick-row span:last-child  { transform: translateX(-100%); }
+.divider { height: 1px; background: var(--border); flex-shrink: 0; margin: 0; }
+.pills-lbl { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+.pills { display: flex; gap: 5px; flex-wrap: wrap; }
+.pill { padding: 5px 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 600; color: var(--muted); background: var(--faint); border: 1.5px solid var(--border); border-radius: 99px; cursor: pointer; transition: all 0.15s; }
+.pill:hover { border-color: var(--brand); color: var(--brand); }
+.pill.active { background: var(--brand); color: white; border-color: var(--brand); }
+.results-panel { display: flex; flex-direction: column; gap: 14px; flex: 1; min-width: 0; }
+/* Hero stat — full-width primary card */
+.stat-hero { background: var(--brand); border-radius: 14px; padding: 16px 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.stat-hero-left .stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.65); margin-bottom: 4px; }
+.stat-hero-left .stat-value { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; color: white; line-height: 1; }
+.stat-hero-left .stat-sub { font-size: 10.5px; color: rgba(255,255,255,0.55); margin-top: 3px; }
+/* Chart + side stats row */
+.chart-and-stats { display: flex; gap: 12px; flex: 1; min-height: 0; }
+.side-stats { display: flex; flex-direction: column; gap: 10px; width: 132px; flex-shrink: 0; justify-content: space-between; }
+.side-stat { border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 13px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; line-height: 1.4; }
+.stat-value { font-size: 17px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1; }
+.stat-sub { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.chart-section { border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; flex: 1; display: flex; flex-direction: column; padding-bottom: 4px; }
+.chart-tabs { display: flex; background: var(--faint); border-radius: 12px; padding: 4px; gap: 4px; flex-shrink: 0; margin: 16px 18px 0; }
+.chart-tab { flex: 1; padding: 9px 16px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600; color: var(--muted); background: transparent; border: none; border-radius: 9px; cursor: pointer; transition: all 0.15s; text-align: center; }
+.chart-tab:hover { color: var(--ink); }
+.chart-tab.active { color: var(--ink); background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); font-weight: 700; }
+.chart-pane { display: none; flex-direction: column; flex: 1; }
+.chart-pane.active { display: flex; flex-direction: column; flex: 1; }
+.chart-box-sub { font-size: 10.5px; color: var(--muted); margin-bottom: 8px; }
+.chart-legend { display: flex; gap: 12px; margin-bottom: 10px; }
+.leg-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--muted); font-weight: 500; }
+.leg-dot { width: 8px; height: 8px; border-radius: 2px; }
+.leg-line-icon { width: 12px; height: 2px; border-radius: 1px; }
+.chart-wrap { flex: 1; min-height: 140px; position: relative; }
+.disc { font-size: 10.5px; color: var(--muted); line-height: 1.6; }
+@media (max-width: 1000px) {
+  .main-row { grid-template-columns: 1fr; align-items: start; }
+  .inputs-panel { height: auto; justify-content: flex-start; }
+  .results-panel { height: auto; }
+  .chart-and-stats { flex-direction: column; }
+  .side-stats { width: 100%; flex-direction: row; }
+  .side-stat { flex: 1; }
+}
+@media (max-width: 560px) {
+  nav, .page { padding-left: 12px; padding-right: 12px; }
+  .stat-row { grid-template-columns: 1fr 1fr; }
+  .hero-headline { font-size: 26px; }
+  .s-input-wrap input[type=number] { width: 55px; }
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="#">
+    <img src="logo.png" alt="Wio Invest logo"/>
+    <span class="nav-logo-name">Wio Invest</span>
+  </a>
+  <span class="nav-chip">Stocks &amp; ETFs</span>
+</nav>
+<div class="page">
+  <div class="hero">
+    <div class="hero-tag"><span class="hero-tag-dot"></span>Wio Invest now offers UCITS ETFs</div>
+    <h1 class="hero-headline">Save dividend tax.<br>Keep more of <em>your returns.</em></h1>
+    <p class="hero-sub">Irish-domiciled UCITS ETFs typically benefit from a 15% dividend tax rate vs 30% for US ETFs. See what that means for your money.</p>
+  </div>
+  <div class="main-row">
+    <!-- LEFT -->
+    <div class="inputs-panel">
+      <div class="isec">
+        <div class="s-top">
+          <span class="s-lbl">Initial investment</span>
+          <div class="s-input-wrap"><span class="pfx">$</span><input type="number" id="amtInput" value="100000" min="10000" max="500000" step="5000"/></div>
+        </div>
+        <div class="track-wrap"><div class="track-fill" id="trackFill" style="width:18.4%"></div><input type="range" id="amtSlider" min="10000" max="500000" step="5000" value="100000"/></div>
+        <div class="tick-row"><span style="left:0%">$10K</span><span style="left:49%">$250K</span><span style="left:100%">$500K</span></div>
+      </div>
+      <div class="isec">
+        <div class="s-top">
+          <span class="s-lbl">Monthly contribution</span>
+          <div class="s-input-wrap"><span class="pfx">$</span><input type="number" id="moInput" value="0" min="0" max="10000" step="100"/><span class="sfx">/mo</span></div>
+        </div>
+        <div class="track-wrap"><div class="track-fill" id="moFill" style="width:0%"></div><input type="range" id="moSlider" min="0" max="10000" step="100" value="0"/></div>
+        <div class="tick-row"><span style="left:0%">$0</span><span style="left:50%">$5K</span><span style="left:100%">$10K</span></div>
+      </div>
+      <div class="isec">
+        <div class="s-top">
+          <span class="s-lbl">Dividend yield</span>
+          <div class="s-input-wrap"><input type="number" id="divInput" value="2" min="0.5" max="5" step="0.1" class="pct"/><span class="sfx">%</span></div>
+        </div>
+        <div class="track-wrap"><div class="track-fill" id="divFill" style="width:33.3%"></div><input type="range" id="divSlider" min="0.5" max="5" step="0.1" value="2"/></div>
+        <div class="tick-row"><span style="left:0%">0.5%</span><span style="left:50%">2.75%</span><span style="left:100%">5%</span></div>
+      </div>
+      <div class="isec">
+        <div class="s-top">
+          <span class="s-lbl">Annual return rate</span>
+          <div class="s-input-wrap"><input type="number" id="retInput" value="7" min="1" max="15" step="0.5" class="pct"/><span class="sfx">%</span></div>
+        </div>
+        <div class="track-wrap"><div class="track-fill" id="retFill" style="width:42.9%"></div><input type="range" id="retSlider" min="1" max="15" step="0.5" value="7"/></div>
+        <div class="tick-row"><span style="left:0%">1%</span><span style="left:50%">8%</span><span style="left:100%">15%</span></div>
+      </div>
+      <div class="isec">
+        <div class="pills-lbl">Investment horizon</div>
+        <div class="pills">
+          <button class="pill" onclick="setYears(5)">5 yrs</button>
+          <button class="pill" onclick="setYears(10)">10 yrs</button>
+          <button class="pill" onclick="setYears(15)">15 yrs</button>
+          <button class="pill active" onclick="setYears(20)">20 yrs</button>
+          <button class="pill" onclick="setYears(25)">25 yrs</button>
+          <button class="pill" onclick="setYears(30)">30 yrs</button>
+        </div>
+      </div>
+    </div>
+    <!-- RIGHT -->
+    <div class="results-panel">
+      <!-- Hero stat -->
+      <div class="stat-hero">
+        <div class="stat-hero-left">
+          <div class="stat-label">Extra savings with UCITS ETFs</div>
+          <div class="stat-value" id="statGap">—</div>
+          <div class="stat-sub" id="statSub">vs a US ETF after 20 years</div>
+        </div>
+      </div>
+      <!-- Chart + side stats -->
+      <div class="chart-and-stats">
+        <div class="chart-section">
+          <div class="chart-tabs">
+            <button class="chart-tab active" data-tab="savings" onclick="switchTab('savings')">Extra earnings with UCITS</button>
+            <button class="chart-tab" data-tab="drag" onclick="switchTab('drag')">Tax drag</button>
+          </div>
+          <div class="chart-pane active" id="pane-savings" style="padding:16px 18px">
+            <div class="chart-box-sub" id="savingsChartSub">—</div>
+            <div class="chart-legend">
+              <div class="leg-item"><div class="leg-dot" style="background:rgba(87,0,255,0.75);border-radius:3px"></div>Cumulative extra earnings vs US ETF</div>
+            </div>
+            <div class="chart-wrap"><canvas id="chartSavings"></canvas></div>
+          </div>
+          <div class="chart-pane" id="pane-drag" style="padding:16px 18px">
+            <div class="chart-box-sub" id="dragChartSub">—</div>
+            <div class="chart-legend">
+              <div class="leg-item"><div class="leg-line-icon" style="background:#DC2626;height:2.5px"></div>US ETF</div>
+              <div class="leg-item"><div class="leg-line-icon" style="background:#5700FF;height:2.5px"></div>UCITS ETF</div>
+              <div class="leg-item"><div style="width:12px;height:8px;background:rgba(220,38,38,0.15);border-radius:1px"></div>Tax saved</div>
+            </div>
+            <div class="chart-wrap"><canvas id="chartDrag"></canvas></div>
+          </div>
+        </div>
+        <!-- Side stats -->
+        <div class="side-stats">
+          <div class="side-stat">
+            <div class="stat-label">Total invested</div>
+            <div class="stat-value" id="statInvested">—</div>
+            <div class="stat-sub" id="statInvestedSub">over 20 years</div>
+          </div>
+          <div class="side-stat">
+            <div class="stat-label">UCITS ETF value</div>
+            <div class="stat-value" id="statUC">—</div>
+            <div class="stat-sub" id="statUCSub">after 20 years</div>
+          </div>
+          <div class="side-stat">
+            <div class="stat-label">US ETF value</div>
+            <div class="stat-value" id="statUS">—</div>
+            <div class="stat-sub" id="statUSSub">after 20 years</div>
+          </div>
+        </div>
+      </div>
+      <p class="disc">Illustrative only. Withholding tax: 15% (UCITS) vs 30% (US ETF). Dividends reinvested annually. Not financial or tax advice. Actual returns will vary.</p>
+    </div>
+  </div>
+</div>
+<script>
+let years = 20, inv = 100000, monthly = 0, divYield = 0.02, annualRet = 0.07;
+function calc(lumpsum, mo, yrs, dy, ar) {
+  const mG = Math.pow(1 + ar, 1/12);
+  const netUS = dy * 0.70;
+  const netUC = dy * 0.85;
+  let usP = lumpsum, ucP = lumpsum, first = true;
+  const gapByYear = [], annDrag = [], cumDrag = [];
+  // Portfolio value lines — both anchored at lumpsum for year 0
+  const ucLine = [lumpsum], usLine = [lumpsum];
+  // Cumulative tax lines for drag chart
+  const taxUSLine = [], taxUCLine = [];
+  let runDrag = 0, runTaxUS = 0, runTaxUC = 0;
+  for (let y = 1; y <= yrs; y++) {
+    let ucNov = 0;
+    for (let m = 1; m <= 12; m++) {
+      if (m === 12) ucNov = ucP;
+      if (first) { usP = usP*mG; ucP = ucP*mG; first = false; }
+      else        { usP = (usP+mo)*mG; ucP = (ucP+mo)*mG; }
+    }
+    const usDivNet = usP * netUS;
+    const ucDivNet = ucNov * netUC;
+    usP += usDivNet;
+    ucP += ucDivNet;
+    const drag = usP * dy * 0.30 - ucNov * dy * 0.15;
+    runDrag += drag;
+    annDrag.push(drag);
+    cumDrag.push(runDrag);
+    gapByYear.push(ucP - usP);
+    // Year-end portfolio snapshots
+    ucLine.push(ucP);
+    usLine.push(usP);
+    // Cumulative tax paid each side
+    runTaxUS += usP * dy * 0.30;
+    runTaxUC += ucNov * dy * 0.15;
+    taxUSLine.push(runTaxUS);
+    taxUCLine.push(runTaxUC);
+  }
+  const annGap = gapByYear.map((v, i) => i === 0 ? v : v - gapByYear[i-1]);
+  return { usVal: usP, ucVal: ucP, gap: ucP - usP, annGap, cumGap: gapByYear, annDrag, cumDrag, ucLine, usLine, taxUSLine, taxUCLine };
+}
+function fmt(n) {
+  const abs = Math.abs(n), sign = n < 0 ? '-' : '';
+  if (abs >= 1e6) return sign + '$' + (abs/1e6).toFixed(2) + 'M';
+  if (abs >= 1e3) return sign + '$' + (abs/1e3).toFixed(1) + 'K';
+  return sign + '$' + Math.round(abs);
+}
+function niceMax(arr) {
+  const peak = Math.max(...arr) * 1.15;
+  if (!peak || peak <= 0) return 100;
+  const mag = Math.pow(10, Math.floor(Math.log10(peak)));
+  for (const f of [0.1, 0.2, 0.25, 0.5, 1]) {
+    const m = Math.ceil(peak / (mag * f)) * (mag * f);
+    if (m / peak <= 1.25) return m;
+  }
+  return Math.ceil(peak / mag) * mag;
+}
+function niceMin(arr) {
+  const floor = Math.min(...arr) * 1.18;
+  if (!floor || floor >= 0) return -100;
+  const mag = Math.pow(10, Math.floor(Math.log10(Math.abs(floor))));
+  for (const f of [0.1, 0.2, 0.25, 0.5, 1]) {
+    const m = Math.floor(floor / (mag * f)) * (mag * f);
+    if (Math.abs(m) / Math.abs(floor) <= 1.3) return m;
+  }
+  return Math.floor(floor / mag) * mag;
+}
+// Single-axis line chart options
+function lineOpts(titleFn) {
+  return {
+    responsive: true, maintainAspectRatio: false,
+    layout: { padding: { top: 4, right: 8 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        mode: 'index', intersect: false,
+        backgroundColor: '#0D0D1A', titleColor: '#B0B8C8', bodyColor: '#fff',
+        titleFont: { family: 'Plus Jakarta Sans', size: 10, weight: '600' },
+        bodyFont:  { family: 'Plus Jakarta Sans', size: 11, weight: '700' },
+        padding: 8, cornerRadius: 6,
+        callbacks: { title: titleFn, label: i => ` ${i.dataset.label}: ${fmt(i.raw)}` }
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, border: { display: false }, ticks: { color: '#B0B8C8', font: { family: 'Plus Jakarta Sans', size: 9 }, maxTicksLimit: 9, padding: 4 } },
+      y: { grid: { color: '#F0F2F5' }, border: { display: false }, ticks: { color: '#B0B8C8', font: { family: 'Plus Jakarta Sans', size: 9 }, maxTicksLimit: 5, padding: 4, callback: v => fmt(v) } }
+    },
+    animation: { duration: 400, easing: 'easeOutQuart' }
+  };
+}
+const initD = calc(inv, monthly, years, divYield, annualRet);
+// Portfolio chart: labels include "Start" (year 0 = initial investment)
+const initPortLabels = ['Start', ...Array.from({length: years}, (_, i) => i + 1)];
+// Tax drag chart: year 1 to N
+const initDragLabels = Array.from({length: years}, (_, i) => i + 1);
+// Chart 1 — bars showing cumulative extra earnings at each year end
+const chartSavings = new Chart(document.getElementById('chartSavings'), {
+  type: 'bar',
+  data: {
+    labels: initDragLabels,
+    datasets: [
+      {
+        label: 'Cumulative extra earnings',
+        data: initD.cumGap,
+        backgroundColor: 'rgba(87,0,255,0.80)',
+        hoverBackgroundColor: '#5700FF',
+        borderRadius: 4,
+        borderSkipped: false
+      }
+    ]
+  },
+  options: (() => {
+    const o = lineOpts(i => `Year ${i[0].label}`);
+    o.scales.y.min = 0;
+    return o;
+  })()
+});
+// Chart 2 — cumulative tax lost: both funds, negated so losses go below zero
+// US ETF (red) descends deeper; UCITS (purple) descends less — gap = saved tax
+const initNegUS = initD.taxUSLine.map(v => -v);
+const initNegUC = initD.taxUCLine.map(v => -v);
+const chartDrag = new Chart(document.getElementById('chartDrag'), {
+  type: 'line',
+  data: {
+    labels: initDragLabels,
+    datasets: [
+      {
+        label: 'US ETF',
+        data: initNegUS,
+        borderColor: '#DC2626',
+        backgroundColor: 'rgba(220,38,38,0.10)',
+        borderWidth: 2.5,
+        pointRadius: 0, pointHoverRadius: 0,
+        tension: 0.35,
+        fill: 1   // fills toward UCITS dataset (index 1), shading the gap
+      },
+      {
+        label: 'UCITS ETF',
+        data: initNegUC,
+        borderColor: '#5700FF',
+        backgroundColor: 'rgba(87,0,255,0.06)',
+        borderWidth: 2.5,
+        pointRadius: 0, pointHoverRadius: 0,
+        tension: 0.35,
+        fill: false
+      }
+    ]
+  },
+  options: (() => {
+    const o = lineOpts(i => `Year ${i[0].label}`);
+    o.scales.y.max = 0;
+    o.scales.y.min = niceMin(initNegUS);
+    o.scales.y.title = { display: true, text: 'Tax lost', color: '#B0B8C8', font: { family: 'Plus Jakarta Sans', size: 10, weight: '600' }, padding: { bottom: 4 } };
+    o.plugins.tooltip.callbacks.label = i => ` ${i.dataset.label}: ${fmt(i.raw)}`;
+    return o;
+  })()
+});
+function switchTab(tab) {
+  document.querySelectorAll('.chart-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.chart-pane').forEach(p =>
+    p.classList.toggle('active', p.id === 'pane-' + tab));
+  requestAnimationFrame(() => {
+    chartSavings.resize();
+    chartDrag.resize();
+    if (!_lastData) return;
+    const { dragLabels, d } = _lastData;
+    if (tab === 'savings') {
+      animateLines(chartSavings, dragLabels, [d.cumGap]);
+    } else {
+      const negUS = d.taxUSLine.map(v => -v);
+      const negUC = d.taxUCLine.map(v => -v);
+      chartDrag.options.scales.y.min = niceMin(negUS);
+      animateLines(chartDrag, dragLabels, [negUS, negUC]);
+    }
+  });
+}
+let _animTimers = [];
+let _lastData = null;
+// Lines: draw point-by-point left to right
+function animateLines(chart, labels, datasetsData) {
+  _animTimers.forEach(t => clearTimeout(t));
+  _animTimers = [];
+  chart.data.labels = labels;
+  datasetsData.forEach((data, di) => { chart.data.datasets[di].data = data.map(() => null); });
+  chart.options.animation = false;
+  chart.update();
+  chart.options.animation = { duration: 60, easing: 'linear' };
+  const total = datasetsData[0].length;
+  for (let i = 0; i < total; i++) {
+    const idx = i;
+    const t = setTimeout(() => {
+      datasetsData.forEach((data, di) => { chart.data.datasets[di].data[idx] = data[idx]; });
+      chart.update('active');
+    }, idx * 18);
+    _animTimers.push(t);
+  }
+}
+function update() {
+  const d = calc(inv, monthly, years, divYield, annualRet);
+  const dragLabels = Array.from({length: years}, (_, i) => i + 1);
+  // Animate the stat number
+  const el = document.getElementById('statGap');
+  const target = d.gap;
+  const start = parseFloat(el.dataset.raw) || 0;
+  el.dataset.raw = target;
+  const t0 = performance.now();
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  (function tick(now) {
+    const p = Math.min((now - t0) / 600, 1);
+    el.textContent = fmt(start + (target - start) * ease(p));
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = fmt(target);
+  })(performance.now());
+  document.getElementById('statUC').textContent  = fmt(d.ucVal);
+  document.getElementById('statUS').textContent  = fmt(d.usVal);
+  document.getElementById('statSub').textContent = `vs a US ETF after ${years} years`;
+  const retPct = ((d.gap / d.usVal) * 100).toFixed(1);
+  document.getElementById('savingsChartSub').textContent = `UCITS grows ${retPct}% more than a US ETF over ${years} years`;
+  const totalTaxUS = d.taxUSLine[d.taxUSLine.length - 1];
+  const totalTaxUC = d.taxUCLine[d.taxUCLine.length - 1];
+  const taxSaved = totalTaxUS - totalTaxUC;
+  document.getElementById('dragChartSub').innerHTML =
+    `<span style="color:#5700FF;font-weight:800;">${fmt(taxSaved)} less tax lost</span> with UCITS ETF over ${years} years`;
+  document.getElementById('statUCSub').textContent = `after ${years} years`;
+  document.getElementById('statUSSub').textContent = `after ${years} years`;
+  const totalInvested = inv + monthly * 12 * years;
+  document.getElementById('statInvested').textContent     = fmt(totalInvested);
+  document.getElementById('statInvestedSub').textContent  = `over ${years} years`;
+  _lastData = { dragLabels, d };
+  // Animate the active chart; silently refresh the hidden one
+  const activeTab = document.querySelector('.chart-tab.active')?.dataset.tab;
+  const negUS = d.taxUSLine.map(v => -v);
+  const negUC = d.taxUCLine.map(v => -v);
+  if (activeTab === 'savings') {
+    animateLines(chartSavings, dragLabels, [d.cumGap]);
+    chartDrag.data.labels = dragLabels;
+    chartDrag.data.datasets[0].data = negUS;
+    chartDrag.data.datasets[1].data = negUC;
+    chartDrag.options.scales.y.min = niceMin(negUS);
+    chartDrag.update('none');
+  } else {
+    chartDrag.options.scales.y.min = niceMin(negUS);
+    animateLines(chartDrag, dragLabels, [negUS, negUC]);
+    chartSavings.data.labels = dragLabels;
+    chartSavings.data.datasets[0].data = d.cumGap;
+    chartSavings.update('none');
+  }
+}
+function setFill(id, val, min, max) {
+  document.getElementById(id).style.width = ((val - min) / (max - min) * 100) + '%';
+}
+function setYears(y) {
+  years = y;
+  document.querySelectorAll('.pill').forEach(b =>
+    b.classList.toggle('active', parseInt(b.textContent) === y));
+  update();
+}
+function fmtHint(n) {
+  if (n >= 1000000) return '$' + (n/1000000) + 'M';
+  if (n >= 1000) return '$' + (n/1000) + 'K';
+  return String(n);
+}
+function bindSlider(sliderId, inputId, fillId, setter, min, max) {
+  const sl   = document.getElementById(sliderId);
+  const inp  = document.getElementById(inputId);
+  const wrap = inp.closest('.s-input-wrap');
+  const apply = v => { setter(v); setFill(fillId, v, min, max); update(); };
+  const hint = document.createElement('div');
+  hint.style.cssText = 'position:absolute;top:calc(100% + 4px);left:0;background:#DC2626;color:white;font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;white-space:nowrap;z-index:10;display:none;';
+  wrap.style.position = 'relative';
+  wrap.appendChild(hint);
+  function showError(msg) {
+    wrap.style.borderColor = '#DC2626';
+    wrap.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.1)';
+    hint.textContent = msg;
+    hint.style.display = 'block';
+  }
+  function clearError() {
+    wrap.style.borderColor = '';
+    wrap.style.boxShadow = '';
+    hint.style.display = 'none';
+  }
+  sl.addEventListener('input', function() {
+    inp.value = this.value;
+    clearError();
+    apply(parseFloat(this.value));
+  });
+  inp.addEventListener('input', function() {
+    const raw = parseFloat(this.value);
+    if (this.value === '' || isNaN(raw)) { clearError(); return; }
+    if (raw < min) {
+      showError('Min is ' + fmtHint(min));
+      sl.value = min; apply(min);
+    } else if (raw > max) {
+      showError('Max is ' + fmtHint(max));
+      sl.value = max; apply(max);
+    } else {
+      clearError();
+      sl.value = raw; apply(raw);
+    }
+  });
+  inp.addEventListener('blur', function() {
+    clearError();
+    let v = parseFloat(this.value);
+    if (isNaN(v) || v < min) v = min;
+    if (v > max) v = max;
+    this.value = v;
+    sl.value = v;
+    apply(v);
+  });
+}
+bindSlider('amtSlider', 'amtInput', 'trackFill', v => { inv = v; },        10000, 500000);
+bindSlider('moSlider',  'moInput',  'moFill',    v => { monthly = v; },    0,     10000);
+bindSlider('divSlider', 'divInput', 'divFill',   v => { divYield = v/100; }, 0.5, 5);
+bindSlider('retSlider', 'retInput', 'retFill',   v => { annualRet = v/100; }, 1,  15);
+update();
+</script>
+</body>
+</html>
