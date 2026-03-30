@@ -85,19 +85,19 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px;
 .stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; line-height: 1.4; }
 .stat-value { font-size: 17px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1; }
 .stat-sub { font-size: 10px; color: var(--muted); margin-top: 3px; }
-.chart-section { border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; flex: 1; display: flex; flex-direction: column; padding-bottom: 4px; }
+.chart-section { border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; flex: 1; display: flex; flex-direction: column; padding-bottom: 4px; min-height: 0; }
 .chart-tabs { display: flex; background: var(--faint); border-radius: 12px; padding: 4px; gap: 4px; flex-shrink: 0; margin: 16px 18px 0; }
 .chart-tab { flex: 1; padding: 9px 16px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600; color: var(--muted); background: transparent; border: none; border-radius: 9px; cursor: pointer; transition: all 0.15s; text-align: center; }
 .chart-tab:hover { color: var(--ink); }
 .chart-tab.active { color: var(--ink); background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.1); font-weight: 700; }
-.chart-pane { display: none; flex-direction: column; flex: 1; }
-.chart-pane.active { display: flex; flex-direction: column; flex: 1; }
-.chart-box-sub { font-size: 10.5px; color: var(--muted); margin-bottom: 8px; }
-.chart-legend { display: flex; gap: 12px; margin-bottom: 10px; }
+.chart-pane { display: none; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+.chart-pane.active { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+.chart-box-sub { font-size: 10.5px; color: var(--muted); margin-bottom: 8px; flex-shrink: 0; }
+.chart-legend { display: flex; gap: 12px; margin-bottom: 10px; flex-shrink: 0; }
 .leg-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--muted); font-weight: 500; }
 .leg-dot { width: 8px; height: 8px; border-radius: 2px; }
 .leg-line-icon { width: 12px; height: 2px; border-radius: 1px; }
-.chart-wrap { flex: 1; min-height: 140px; position: relative; }
+.chart-wrap { flex: 1; min-height: 140px; height: 160px; position: relative; }
 .disc { font-size: 10.5px; color: var(--muted); line-height: 1.6; }
 @media (max-width: 1000px) {
   .main-row { grid-template-columns: 1fr; align-items: start; }
@@ -368,7 +368,7 @@ const chartDrag = new Chart(document.getElementById('chartDrag'), {
         borderWidth: 2.5,
         pointRadius: 0, pointHoverRadius: 0,
         tension: 0.35,
-        fill: 1   // fills toward UCITS dataset (index 1), shading the gap
+        fill: { target: 1, above: 'rgba(220,38,38,0.12)' }   // fills toward UCITS dataset (index 1), shading the gap
       },
       {
         label: 'UCITS ETF',
@@ -388,6 +388,7 @@ const chartDrag = new Chart(document.getElementById('chartDrag'), {
     o.scales.y.min = niceMin(initNegUS);
     o.scales.y.title = { display: true, text: 'Tax lost', color: '#B0B8C8', font: { family: 'Plus Jakarta Sans', size: 10, weight: '600' }, padding: { bottom: 4 } };
     o.plugins.tooltip.callbacks.label = i => ` ${i.dataset.label}: ${fmt(i.raw)}`;
+    o.plugins.filler = { propagate: false };
     return o;
   })()
 });
